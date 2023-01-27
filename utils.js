@@ -19,3 +19,7 @@ export function createAndSetupCanvas (width, height) {
 
     return canvasElement;
 }
+
+export function smoothstep(t) {
+    return t * t * (3 - 2 * t);
+}
