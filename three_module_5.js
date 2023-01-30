@@ -40310,17 +40310,6 @@ class FileLoader extends Loader {
 			onProgress: onProgress,
 			onError: onError,
 		} );
-
-		
-		// create request
-		const req = new Request( url, {
-			headers: new Headers( this.requestHeader ),
-			credentials: 'same-origin',
-			// An abort controller could be added within a future PR
-		} );
-
-		// record states ( avoid data race )
-		const mimeType = this.mimeType;
 		const responseType = this.responseType;
 
 		let data;
