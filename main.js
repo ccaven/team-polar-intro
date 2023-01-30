@@ -5,42 +5,43 @@ import { DRACOLoader } from "./three/examples/jsm/loaders/DRACOLoader.js";
 import { createAndSetupCanvas, smoothstep } from "./utils.js";
 import { lerp } from "./three/src/math/MathUtils.js";
 
-const canvas = createAndSetupCanvas(600, 600);
-
-const renderer = new THREE.WebGLRenderer({ canvas });
-
-const scene = new THREE.Scene();
-
-const texture = new THREE.TextureLoader().load("./res/disc.png");
-
-const material = new THREE.ShaderMaterial({
-    uniforms: {
-        time: { value: 1.914 },
-        animTime: { value: 0.0 },
-        pointTexture: { value: texture },
-    },
-
-    vertexShader: getVertexShader(),
-    fragmentShader: getFragmentShader(),
-
-    transparent: true,
-
-    face: THREE.DoubleSide,
-    blendEquation: THREE.AdditiveBlending,
-    depthFunc: THREE.AlwaysDepth,
-});
-
-const dracoLoader = new DRACOLoader();
-
-const loader = new GLTFLoader();
-
-const camera = new THREE.PerspectiveCamera(75, 1.0, 1.0, 5000.0);
-
 init();
 
 function init() {
 
+    const canvas = createAndSetupCanvas(600, 600);
+
+    const renderer = new THREE.WebGLRenderer({ canvas });
+
+    const scene = new THREE.Scene();
+
+    const texture = new THREE.TextureLoader().load("./res/disc.png");
+
+    const material = new THREE.ShaderMaterial({
+        uniforms: {
+            time: { value: 1.914 },
+            animTime: { value: 0.0 },
+            pointTexture: { value: texture },
+        },
+
+        vertexShader: getVertexShader(),
+        fragmentShader: getFragmentShader(),
+
+        transparent: true,
+
+        face: THREE.DoubleSide,
+        blendEquation: THREE.AdditiveBlending,
+        depthFunc: THREE.AlwaysDepth,
+    });
+
+    const dracoLoader = new DRACOLoader();
+
+    const loader = new GLTFLoader();
+
+    const camera = new THREE.PerspectiveCamera(75, 1.0, 1.0, 5000.0);
+
     loader.setDRACOLoader(dracoLoader);
+    
     loader.load("./res/polar_bear_points_remesh.glb", (gltf) => {
         console.log(gltf);
 
@@ -52,14 +53,7 @@ function init() {
         points.translateY(-25);
 
         const numPoints = points.geometry.getAttribute("position").count;
-        const rndPoints = new Float32Array(3 * numPoints);
-
-        for (let i = 0; i < numPoints; i ++) {
-            rndPoints[i * 3 + 0] = Math.random() * 2000.0 - 1000.0;
-            rndPoints[i * 3 + 1] = Math.random() * 2000.0 - 1000.0;
-            rndPoints[i * 3 + 2] = Math.random() * 2000.0 - 1000.0;
-        }
-
+        const rndPoints = generateRandomPointsArray(numPoints, 1000);
         const rndPointAttribute = new THREE.BufferAttribute(rndPoints, 3, false);
         points.geometry.setAttribute("rndPoint", rndPointAttribute);
 
@@ -80,6 +74,51 @@ function init() {
     let then = 0;
     let t = 0;
 
+
+    function animate(t) {
+        t = smoothstep(t);
+    
+        const startTime = 1.914;
+        const endTime = 0.0;
+        material.uniforms["animTime"].value = lerp(startTime, endTime, t);
+    
+        const cameraPositions = [
+            // Starting position
+            new THREE.Vector3(200, 0, 0),
+    
+            // Ending position
+            new THREE.Vector3(137.21, 61.17, -16.68)
+        ];
+    
+        const cameraQuaternions = [
+            // Starting rotation
+            new THREE.Quaternion(
+                0,
+                0.7071067811865476,
+                0,
+                0.7071067811865476
+            ),
+    
+            // Ending rotation
+            new THREE.Quaternion(
+                -0.044043449956680664,
+                0.8651926590903987,
+                0.07721638771201698,
+                0.4934971799723947
+            )
+        ];
+    
+        // Interpolate positions
+        camera.setRotationFromQuaternion(cameraQuaternions[0].slerp(cameraQuaternions[1], t));
+        
+        const newPosition = cameraPositions[0].lerp(cameraPositions[1], t);
+    
+        camera.position.set(newPosition.x, newPosition.y, newPosition.z);
+    
+        camera.matrixWorldNeedsUpdate = true;
+    
+    }
+
     function render(now) {
 
         now *= 0.001; // convert to seconds
@@ -92,64 +131,25 @@ function init() {
 
         renderer.render(scene, camera);
 
-        //controls.update();
-
         t += deltaTime;
 
         material.uniforms["time"].value = t;
-        //material.uniformsNeedUpdate = true;
     }
 
     requestAnimationFrame(render);
 
 }
 
-function animate(t) {
-    t = smoothstep(t);
+function generateRandomPointsArray(size, range) {
+    const rndPoints = new Float32Array(3 * size);
 
-    const startTime = 1.914;
-    const endTime = 0.0;
-    material.uniforms["animTime"].value = lerp(startTime, endTime, t);
+    for (let i = 0; i < size; i ++) {
+        rndPoints[i * 3 + 0] = Math.random() * range * 2 - range;
+        rndPoints[i * 3 + 1] = Math.random() * range * 2 - range;
+        rndPoints[i * 3 + 2] = Math.random() * range * 2 - range;
+    }
 
-    const cameraPositions = [
-        // Starting position
-        new THREE.Vector3(200, 0, 0),
-
-        // Ending position
-        new THREE.Vector3(137.21, 61.17, -16.68)
-    ];
-
-    const cameraQuaternions = [
-        // Starting rotation
-        new THREE.Quaternion(
-            0,
-            0.7071067811865476,
-            0,
-            0.7071067811865476
-        ),
-
-        // Ending rotation
-        new THREE.Quaternion(
-            -0.044043449956680664,
-            0.8651926590903987,
-            0.07721638771201698,
-            0.4934971799723947
-        )
-    ];
-
-    // Interpolate positions
-    camera.setRotationFromQuaternion(cameraQuaternions[0].slerp(cameraQuaternions[1], t));
-    
-    const newPosition = cameraPositions[0].lerp(cameraPositions[1], t);
-
-    camera.position.set(newPosition.x, newPosition.y, newPosition.z);
-
-    camera.matrixWorldNeedsUpdate = true;
-
-    // Interpolate rotations
-
-
-
+    return rndPoints;
 }
 
 function getVertexShader() {
