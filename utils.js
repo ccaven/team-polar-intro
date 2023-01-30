@@ -23,3 +23,18 @@ export function createAndSetupCanvas (width, height) {
 export function smoothstep(t) {
     return t * t * (3 - 2 * t);
 }
+
+export function getMousePos(canvas, evt) {
+    var rect = canvas.getBoundingClientRect();
+    return {
+        x: (evt.clientX - rect.left) / (rect.right - rect.left),
+        y: (evt.clientY - rect.top) / (rect.bottom - rect.top)
+    };
+}
+
+export async function loadFileURI(filename) {
+
+    const module = await import("./res_files/" + filename + ".js");
+    return module.retrieveData();
+
+}

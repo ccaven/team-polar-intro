@@ -1,13 +1,15 @@
 import * as THREE from "./three/src/Three.js";
 
 import { GLTFLoader } from "./three/examples/jsm/loaders/GLTFLoader.js";
+import { FontLoader } from "./three/examples/jsm/loaders/FontLoader.js";
 import { DRACOLoader } from "./three/examples/jsm/loaders/DRACOLoader.js";
-import { createAndSetupCanvas, smoothstep } from "./utils.js";
+import { TextGeometry } from "./three/examples/jsm/geometries/TextGeometry.js";
+import { createAndSetupCanvas, smoothstep, getMousePos, loadFileURI } from "./utils.js";
 import { lerp } from "./three/src/math/MathUtils.js";
 
 init();
 
-function init() {
+async function init() {
 
     const canvas = createAndSetupCanvas(600, 600);
 
@@ -15,7 +17,8 @@ function init() {
 
     const scene = new THREE.Scene();
 
-    const texture = new THREE.TextureLoader().load("./res/disc.png");
+    const manager = new THREE.LoadingManager();
+    const texture = new THREE.TextureLoader(manager).load(await loadFileURI("disc.png"));
 
     const material = new THREE.ShaderMaterial({
         uniforms: {
@@ -34,46 +37,55 @@ function init() {
         depthFunc: THREE.AlwaysDepth,
     });
 
-    const dracoLoader = new DRACOLoader();
+    const dracoLoader = new DRACOLoader(manager);
 
-    const loader = new GLTFLoader();
+    const loader = new GLTFLoader(manager);
 
     const camera = new THREE.PerspectiveCamera(75, 1.0, 1.0, 5000.0);
 
     loader.setDRACOLoader(dracoLoader);
-    
-    loader.load("./res/polar_bear_points_remesh.glb", (gltf) => {
-        console.log(gltf);
 
-        /** @type {THREE.Points} */
-        const points = gltf.scene.children[0];
+    //const gltf = await loader.loadAsync("./res/polar_bear_points_remesh.glb");
+    const gltf = await loader.loadAsync(await loadFileURI("polar_bear_points_remesh.glb"));
 
-        points.material = material;
+    /** @type {THREE.Points} */
+    const points = gltf.scene.children[0];
 
-        points.translateY(-25);
+    points.material = material;
 
-        const numPoints = points.geometry.getAttribute("position").count;
-        const rndPoints = generateRandomPointsArray(numPoints, 1000);
-        const rndPointAttribute = new THREE.BufferAttribute(rndPoints, 3, false);
-        points.geometry.setAttribute("rndPoint", rndPointAttribute);
+    points.translateY(-25);
 
-        console.log(points);
+    const numPoints = points.geometry.getAttribute("position").count;
+    const rndPoints = generateRandomPointsArray(numPoints, 1000);
+    const rndPointAttribute = new THREE.BufferAttribute(rndPoints, 3, false);
+    points.geometry.setAttribute("rndPoint", rndPointAttribute);
 
-        scene.add(points);
-    });
 
     renderer.setClearColor(new THREE.Color(0.0, 0.1, 0.25));
 
-    document.body.onkeydown = (keyboardEvent) => {
-        if (keyboardEvent.key.toString() == "p") {
-            console.log(camera.position);
-            console.log(camera.quaternion);
-        }
-    };
+    const fontLoader = new FontLoader();
+    const hackFont = await fontLoader.loadAsync(await loadFileURI("Hack_Regular.json"));
+
+    const title = generateTextMesh("Team Polar", hackFont, 20);
+
+    title.rotateY(Math.PI * 3 / 4);
+    title.translateX(-215);
+    title.translateY(75);
+    title.translateZ(-60);
+
+    const members = generateTextMesh("Polar\nxacer\nJSCoder\nJake K.\nEragon\nCoraL", hackFont, 10);
+
+    members.rotateY(Math.PI * 3 / 4);
+    members.translateX(-165);
+    members.translateY(25);
+    members.translateZ(-60);
+    
+    scene.add(points);
+    scene.add(title);
+    scene.add(members);
 
     let then = 0;
     let t = 0;
-
 
     function animate(t) {
         t = smoothstep(t);
@@ -116,9 +128,15 @@ function init() {
         camera.position.set(newPosition.x, newPosition.y, newPosition.z);
     
         camera.matrixWorldNeedsUpdate = true;
-    
     }
 
+    let mx = 0, my = 0;
+    canvas.onmousemove = evt => {
+        const { x, y } = getMousePos(canvas, evt);
+        mx = x;
+        my = y;
+    };
+    
     function render(now) {
 
         now *= 0.001; // convert to seconds
@@ -129,6 +147,11 @@ function init() {
 
         animate(Math.min(t / 5.0, 1.0));
 
+        camera.rotateY(+0.1 * (mx - 0.5));
+        camera.rotateX(+0.1 * (my - 0.5));
+
+        //animate(1.0);
+
         renderer.render(scene, camera);
 
         t += deltaTime;
@@ -138,6 +161,32 @@ function init() {
 
     requestAnimationFrame(render);
 
+}
+
+function generateTextMesh(text, font, size) {
+
+    const textGeo = new TextGeometry(text, {
+        font,
+        size,
+        height: 1,
+        curveSegments: 4,
+        bevelEnabled: false
+    });
+
+    textGeo.computeBoundingBox();
+
+    const centerOffset = - 0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
+
+    const mesh = new THREE.Mesh( textGeo );
+
+    mesh.position.x = centerOffset;
+    mesh.position.y = 0.0;
+    mesh.position.z = 0;
+
+    mesh.rotation.x = 0;
+    mesh.rotation.y = Math.PI * 2;
+
+    return mesh;
 }
 
 function generateRandomPointsArray(size, range) {
