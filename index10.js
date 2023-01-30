@@ -138,6 +138,10 @@ export async function init() {
         mx = x;
         my = y;
     };
+
+    canvas.onmousedown = _ => {
+        t = 0;
+    }
     
     function render(now) {
 
