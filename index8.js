@@ -1,8 +1,8 @@
-import * as THREE from "./three_module_5.js";
+import * as THREE from "./three_module_6.js";
 
-import { GLTFLoader } from "./GLTFLoader3.js";
+import { GLTFLoader } from "./GLTFLoader4.js";
 import { FontLoader } from "./FontLoader3.js";
-import { DRACOLoader } from "./DRACOLoader3.js";
+import { DRACOLoader } from "./DRACOLoader4.js";
 import { TextGeometry } from "./TextGeometry3.js";
 import { createAndSetupCanvas, smoothstep, getMousePos, loadFileURI } from "./utils.js";
 

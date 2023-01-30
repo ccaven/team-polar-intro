@@ -61,7 +61,7 @@ import {
 	Vector3,
 	VectorKeyframeTrack,
 	sRGBEncoding
-} from './three_module_5.js';
+} from './three_module_6.js';
 
 class GLTFLoader extends Loader {
 
@@ -201,8 +201,6 @@ class GLTFLoader extends Loader {
 
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
-		loader.setRequestHeader( this.requestHeader );
-		loader.setWithCredentials( this.withCredentials );
 
 		loader.load( url, function ( data ) {
 

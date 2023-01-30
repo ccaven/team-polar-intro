@@ -40270,6 +40270,7 @@ class FileLoader extends Loader {
 
 		const cached = Cache.get( url );
 
+		/*
 		if ( cached !== undefined ) {
 
 			this.manager.itemStart( url );
@@ -40285,6 +40286,7 @@ class FileLoader extends Loader {
 			return cached;
 
 		}
+		*/
 
 		// Check if request is duplicate
 
@@ -40329,13 +40331,9 @@ class FileLoader extends Loader {
 				data = ab
 				break;
 			case 'blob':
-				data = new Blob([ab], {type: mimeString});
-				break;
 			case 'document':
-				data = atob(byteString);
-				break;
 			case 'json':
-				data = atob(byteString);
+				data = new Blob([ab], {type: mimeString});
 				break;
 			default:
 				data = byteString;

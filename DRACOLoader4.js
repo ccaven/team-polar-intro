@@ -3,7 +3,7 @@ import {
 	BufferGeometry,
 	FileLoader,
 	Loader
-} from './three_module_5.js';
+} from './three_module_6.js';
 
 const _taskCache = new WeakMap();
 
@@ -233,12 +233,12 @@ class DRACOLoader extends Loader {
 
 		if ( useJS ) {
 
-			librariesPending.push( this._loadLibrary( 'draco_decoder.js', 'text' ) );
+			//librariesPending.push( this._loadLibrary( 'draco_decoder.js', 'text' ) );
 
 		} else {
 
-			librariesPending.push( this._loadLibrary( 'draco_wasm_wrapper.js', 'text' ) );
-			librariesPending.push( this._loadLibrary( 'draco_decoder.wasm', 'arraybuffer' ) );
+			//librariesPending.push( this._loadLibrary( 'draco_wasm_wrapper.js', 'text' ) );
+			//librariesPending.push( this._loadLibrary( 'draco_decoder.wasm', 'arraybuffer' ) );
 
 		}
 
