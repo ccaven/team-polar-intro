@@ -1,9 +1,9 @@
 import * as THREE from "./three.module.js";
 
-import { GLTFLoader } from "./GLTFLoader.js";
-import { FontLoader } from "./FontLoader.js";
-import { DRACOLoader } from "./DRACOLoader.js";
-import { TextGeometry } from "./TextGeometry.js";
+import { GLTFLoader } from "./GLTFLoader2.js";
+import { FontLoader } from "./FontLoader2.js";
+import { DRACOLoader } from "./DRACOLoader2.js";
+import { TextGeometry } from "./TextGeometry2.js";
 import { createAndSetupCanvas, smoothstep, getMousePos, loadFileURI } from "./utils.js";
 
 export async function init() {
