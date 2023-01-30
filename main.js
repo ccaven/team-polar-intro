@@ -7,9 +7,7 @@ import { TextGeometry } from "./three/examples/jsm/geometries/TextGeometry.js";
 import { createAndSetupCanvas, smoothstep, getMousePos, loadFileURI } from "./utils.js";
 import { lerp } from "./three/src/math/MathUtils.js";
 
-init();
-
-async function init() {
+export async function init() {
 
     const canvas = createAndSetupCanvas(600, 600);
 
