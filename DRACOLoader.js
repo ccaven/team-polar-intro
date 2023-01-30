@@ -3,7 +3,7 @@ import {
 	BufferGeometry,
 	FileLoader,
 	Loader
-} from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.149.0/three.module.js';
+} from 'three.module.js';
 
 const _taskCache = new WeakMap();
 

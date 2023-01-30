@@ -1,4 +1,4 @@
-import * as THREE from "https://cdnjs.cloudflare.com/ajax/libs/three.js/0.149.0/three.module.js";
+import * as THREE from "three.module.js";
 
 import { GLTFLoader } from "./GLTFLoader.js";
 import { FontLoader } from "./FontLoader.js";

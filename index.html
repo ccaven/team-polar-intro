@@ -8,23 +8,10 @@
     <title>Team Polar Intro</title>
 </head>
 <body>
-    
-    <!-- Import maps polyfill -->
-    <!-- Remove this when import maps will be widely supported -->
-    <script async src="https://cdn.jsdelivr.net/gh/ccaven/team-polar-intro@latest/es-module-shims.js"></script>
-
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://cdnjs.cloudflare.com/ajax/libs/three.js/0.149.0/three.module.js",
-                "index": "https://cdn.jsdelivr.net/gh/ccaven/team-polar-intro@latest/main.js"
-            }
-        }
-    </script>
 
     <script type="module">
 
-        import { init } from "index";
+        import { init } from "https://cdn.jsdelivr.net/gh/ccaven/team-polar-intro@latest/index2.js";
 
         init();
 
