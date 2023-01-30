@@ -15,7 +15,10 @@ export async function init() {
     const scene = new THREE.Scene();
 
     const manager = new THREE.LoadingManager();
-    const texture = new THREE.TextureLoader(manager).load(await loadFileURI("disc.png"));
+    //const texture = new THREE.TextureLoader(manager).load(await loadFileURI("disc.png"));
+    const texture = getDotTexture(200);
+
+
 
     const material = new THREE.ShaderMaterial({
         uniforms: {
@@ -44,6 +47,8 @@ export async function init() {
 
     //const gltf = await loader.loadAsync("./res/polar_bear_points_remesh.glb");
     const gltf = await loader.loadAsync(await loadFileURI("polar_bear_points_remesh.glb"));
+
+    console.log(gltf);
 
     /** @type {THREE.Points} */
     const points = gltf.scene.children[0];
@@ -157,6 +162,40 @@ export async function init() {
     }
 
     requestAnimationFrame(render);
+
+}
+
+function getDotTexture(s) {
+
+    let data = new Uint8Array(4 * s * s);
+
+    for (let y = 0; y < s; y ++) {
+        for (let x = 0; x < s; x ++) {
+
+            let _x = x / s - 0.5;
+            let _y = y / s - 0.5;
+            let m = 2.0 * Math.sqrt(_x * _x + _y * _y);
+
+            m = Math.pow(m, 1.0);
+
+            m = Math.max(1.0 - m, 0.0);
+
+            let l = x + y * s << 2;
+            data[l + 0] = 255 * m;
+            data[l + 1] = 255 * m;
+            data[l + 2] = 255 * m;
+            data[l + 3] = 255 * m;
+
+        }
+    }
+
+    const imgData = new ImageData(s, s);
+    imgData.data.set(data);
+
+    const tex = new THREE.Texture(imgData);
+    tex.needsUpdate = true;
+
+    return tex;
 
 }
 
