@@ -40311,6 +40311,7 @@ class FileLoader extends Loader {
 			onError: onError,
 		} );
 
+		
 		// create request
 		const req = new Request( url, {
 			headers: new Headers( this.requestHeader ),
@@ -40322,6 +40323,50 @@ class FileLoader extends Loader {
 		const mimeType = this.mimeType;
 		const responseType = this.responseType;
 
+		let data;
+		var byteString = atob(url.split(',')[1]);
+		var ab = new ArrayBuffer(byteString.length);
+			
+		// create a view into the buffer
+		var ia = new Uint8Array(ab);
+		
+		// set the bytes of the buffer to the correct values
+		for (var i = 0; i < byteString.length; i++) {
+			ia[i] = byteString.charCodeAt(i);
+		}
+
+		switch ( responseType ) {
+			case 'arraybuffer':
+				data = ab
+				break;
+			case 'blob':
+				data = new Blob([ab], {type: mimeString});
+				break;
+			case 'document':
+				data = atob(byteString);
+				break;
+			case 'json':
+				data = atob(byteString);
+				break;
+			default:
+				data = byteString;
+
+		}
+
+		Cache.add( url, data );
+
+		const callbacks = loading[ url ];
+		delete loading[ url ];
+
+		for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
+
+			const callback = callbacks[ i ];
+			if ( callback.onLoad ) callback.onLoad( data );
+
+		}
+
+		return data;
+		/*
 		// start the fetch
 		fetch( req )
 			.then( response => {
@@ -40499,6 +40544,7 @@ class FileLoader extends Loader {
 			} );
 
 		this.manager.itemStart( url );
+		*/
 
 	}
 
