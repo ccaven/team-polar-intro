@@ -1,4 +1,4 @@
-import * as THREE from "./three.module.js";
+import * as THREE from "./three_module_2.js";
 
 import { GLTFLoader } from "./GLTFLoader2.js";
 import { FontLoader } from "./FontLoader2.js";
